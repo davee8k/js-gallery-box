@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Gallery Box Demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link type="text/css" rel="stylesheet" media="all" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+		<link type="text/css" rel="stylesheet" media="all" href="../src/style.css">
+		<script type="text/javascript" src="../src/galleryBox.js"></script>
+	</head>
+	<body>
+		<header class="jumbotron text-center">
+			<h1 class="page-header">GalleryBox demos</h1>
+		</header>
+		<main class="container">
+			<p>
+				You can use <kbd>&larr;</kbd>, <kbd>&rarr;</kbd> for paging and <kbd>Esc</kbd> for closing gallery window.
+			</p>
+			<article>
+				<h2>Basic link usage</h2>
+				<pre><code>$("#gallery1").galleryBox({});</code></pre>
+				<div class="row" id="gallery1">
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_1_full.png"><img src="../img/img_1.png" class="card-img-top" alt="alternative title 1" title="title 1" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_2_full.png"><img src="../img/img_2.png" class="card-img-top" alt="alternative title 2" title="Image too big for screen" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_3_full.jpg"><img src="../img/img_3.jpg" class="card-img-top" alt="alternative title 3" title="title 3" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_1_full.png"><img src="../img/img_1.png" class="card-img-top" alt="alternative title 1" title="" /></a>
+					</div>
+				</div>
+			</article>
+			<hr>
+			<article>
+				<h2>Use only specific class</h2>
+				<pre><code>$("#gallery2").galleryBox({page: '.gallery-link'});</code></pre>
+				<div class="row" id="gallery2">
+					<p>
+						This is text with link on <a href="../img/img_1_full.png" title="title 1" class="gallery-link">gallery image one</a>,
+						next link <a href="../img/img_2_full.png" title="Image too big for screen">without gallerybox</a>
+						and another one<a href="../img/img_3_full.jpg" title="title 3" class="gallery-link">gallery image three</a>.
+					</p>
+				</div>
+			</article>
+			<hr>
+			<article>
+				<h2>Without background</h2>
+				<pre><code>$("#gallery3").galleryBox({background: false});</code></pre>
+				<div class="row" id="gallery3">
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_1_full.png"><img src="../img/img_1.png" class="card-img-top" alt="alternative title 1" title="title 1" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_2_full.png"><img src="../img/img_2.png" class="card-img-top" alt="alternative title 2" title="Image too big for screen" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_3_full.jpg"><img src="../img/img_3.jpg" class="card-img-top" alt="alternative title 3" title="title 3" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_1_full.png"><img src="../img/img_1.png" class="card-img-top" alt="alternative title 1" title="" /></a>
+					</div>
+				</div>
+			</article>
+			<hr>
+			<article>
+				<h2>Disable paging between images</h2>
+				<pre><code>$("#gallery4").galleryBox({arrows: false});</code></pre>
+				<div class="row" id="gallery4">
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_1_full.png"><img src="../img/img_1.png" class="card-img-top" alt="alternative title 1" title="title 1" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_2_full.png"><img src="../img/img_2.png" class="card-img-top" alt="alternative title 2" title="Image too big for screen" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_3_full.jpg"><img src="../img/img_3.jpg" class="card-img-top" alt="alternative title 3" title="title 3" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_1_full.png"><img src="../img/img_1.png" class="card-img-top" alt="alternative title 1" title="" /></a>
+					</div>
+				</div>
+			</article>
+
+			<article>
+				<h2>Show image counter</h2>
+				<pre><code>$("#gallery5").galleryBox({pager: true});</code></pre>
+				<div class="row" id="gallery5">
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_1_full.png"><img src="../img/img_1.png" class="card-img-top" alt="alternative title 1" title="title 1" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_2_full.png"><img src="../img/img_2.png" class="card-img-top" alt="alternative title 2" title="Image too big for screen" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_3_full.jpg"><img src="../img/img_3.jpg" class="card-img-top" alt="alternative title 3" title="title 3" /></a>
+					</div>
+					<div class="col-md-3">
+						<a class="card mb-3 shadow-sm" href="../img/img_1_full.png"><img src="../img/img_1.png" class="card-img-top" alt="alternative title 1" title="" /></a>
+					</div>
+				</div>
+			</article>
+			<hr>
+		</main>
+
+		<script type="text/javascript">
+		//<![CDATA[
+		$(function() {
+			$("#gallery1").galleryBox({});
+
+			$("#gallery2").galleryBox({page: '.gallery-link'});
+
+			$("#gallery3").galleryBox({background: false});
+
+			$("#gallery4").galleryBox({arrows: false});
+
+			$("#gallery5").galleryBox({pager: true});
+		});
+		// ]]>
+		</script>
+	</body>
+</html>

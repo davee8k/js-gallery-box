@@ -1,8 +1,8 @@
 /**
  * GalleryBox version for jQuery 1.8+
  * @author DaVee
- * @version 0.26
- * @license under WTFPL 2.0
+ * @version 0.27
+ * @license WTFNMFPL 1.0
  */
 (function ($) {
 	$.fn.galleryBox = function (option) {
@@ -65,8 +65,8 @@
 			img = img.substring(img.lastIndexOf('/') + 1);
 			for (var i = 0; i < this.srcs.length; i++) {
 				if (this.srcs[i].indexOf(img) > 0) {
-					$('#'+element).click( function () { return self.showNum(i); });
-					$('#'+element).css('cursor','pointer');
+					$('#' + element).click( function () { return self.showNum(i); });
+					$('#' + element).css('cursor','pointer');
 					break;
 				}
 			}
@@ -83,15 +83,15 @@
 			var width = $(img).attr('width') || $(img).prop('width');
 			var orgWidth = width;
 			var winHeight = $(window).height() - $(this.box).find('.gallery-box').outerHeight(true) + $(this.box).find('.gallery-box-image').outerHeight(true);
-			var winWidth = $(this.box).find('.gallery-box').width() - $(this.box).find('.gallery-box-content').outerWidth(true) + $(this.box).find('.gallery-box-image').outerWidth();
+			var winWidth = ($(this.box)[0].getBoundingClientRect().width || $(this.box).find('.gallery-box').width()) + $(this.box).find('.gallery-box').width() - $(this.box).find('.gallery-box').outerWidth(true);
 
 			if (this.scale) {
 				if (height > winHeight) {
-					width = width * winHeight / height;
+					width = Math.floor(width * winHeight / height);
 					height = winHeight;
 				}
 				if (width > winWidth) {
-					height = height * winWidth / width;
+					height = Math.floor(height * winWidth / width);
 					width = winWidth;
 				}
 			}
@@ -211,8 +211,10 @@
 			$(this.box).find('a.gallery-box-right').click(function() {return self.showNext(false);});
 			$(document).keydown( function(e) {
 				if ($(self.box).is(':visible')) {
-					if (e.keyCode == 37) { e.preventDefault(); self.showNext(true); }
-					else if (e.keyCode == 39) { e.preventDefault(); self.showNext(false); }
+					if (self.arrows || self.pager) {
+						if (e.keyCode == 37) { e.preventDefault(); self.showNext(true); }
+						else if (e.keyCode == 39) { e.preventDefault(); self.showNext(false); }
+					}
 					else if (e.keyCode == 27) { e.preventDefault(); $(self.box).fadeOut(500); }
 				}
 			});
@@ -224,21 +226,23 @@
 		 * Create elements for gallery window
 		 * @param {Boolean} background
 		 */
-		this.create = function (background) {
-			this.box = $('<div class="gallery-box-all"' + (this.mark ? ' id="' + this.mark + '"' : '') + '>' + (background ? '<div class="gallery-box-black"></div>' : '') + '</div>');
-			$(this.box).append('<div class="gallery-box"><div class="gallery-box-content">' +
+		this.create = function (customClass, background) {
+			this.box = $('<div class="gallery-box-all' + (customClass ? ' ' + customClass : '') + '"'
+					+ (this.mark ? ' id="' + this.mark + '"' : '') + '>'
+					+ (background ? '<div class="gallery-box-black"></div>' : '') + '</div>');
+			$(this.box).append('<div class="gallery-box">' +
 				'<div class="gallery-box-image"><img /></div>' +
 				'<div class="gallery-box-info">' + (this.arrows ? '<a class="gallery-box-left" title="'+this.locale["prev"]+'"><span>' + this.icons["prev"] + '</span></a>' +
 				(this.pager ? '<span class="gallery-box-num-current">1</span> / <span class="gallery-box-num-count">' + this.count + '</span>' : '') +
 				'<a class="gallery-box-right" title="'+this.locale["next"]+'"><span>' + this.icons["next"] + '</span></a>' : '') +
 				'<a class="gallery-box-close" title="'+this.locale["close"]+'"><span>' + this.icons["close"] + '</span></a></div>' +
 				(this.scale ? '<a class="gallery-box-zoom" title="'+this.locale["zoom"]+'" target="_blank"></a>' : '') +
-				'<p class="gallery-box-title"></p></div></div>');
+				'<p class="gallery-box-title"></p></div>');
 			$("body").append(this.box);
 		};
 
 		if (this.load(this)) {
-			this.create(option['background'] !== undefined ? option['background'] : true);
+			this.create(option['class'] !== undefined ? option['class'] : '', option['background'] !== undefined ? option['background'] : true);
 			this.appendAction();
 		};
 
