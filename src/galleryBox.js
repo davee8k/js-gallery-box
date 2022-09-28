@@ -1,8 +1,8 @@
 /**
- * Jquery GalleryBox version for jQuery 1.8+, support IE8+
+ * jQuery Gallery Box version for jQuery 1.8+, support IE8+
  *
  * @author DaVee8k
- * @version 0.28.1
+ * @version 0.28.3
  * @license WTFNMFPL 1.0
  */
 (function ($) {
@@ -19,13 +19,13 @@
 		this.plugin = option['plugin'] === undefined ? false : option['plugin'];
 		// variables
 		this.box = null;
-		this.mark = option['mark'] === undefined ? false : option['mark'];
-		this.page = option['page'] === undefined ? 'a' : option['page'];
+		this.mark = option['mark'] === undefined ? null : option['mark'];
+		this.item = option['item'] === undefined ? 'a' : option['item'];
 		this.arrows = option['arrows'] === undefined ? true : option['arrows'];
 		this.pager = option['pager'] === undefined ? false : option['pager'];
 		this.duration = option['duration'] === undefined ? 250 : option['duration'];
-		this.scale = option['scale'] === undefined ? true : option['scale'];
-		this.iframe = option['iframe'] === undefined ? false : option['iframe'];
+		this.shrink = option['shrink'] === undefined ? true : option['shrink'];
+		this.iframe = option['iframe'] === undefined ? null : option['iframe'];
 
 		this.current = -1;
 		this.count = 0;
@@ -33,7 +33,7 @@
 
 		// load links from element
 		this.load = function (element) {
-			var images = $(element).find(this.page);
+			var images = $(element).find(this.item);
 			if (images.length !== 0) {
 				$(images).each( function () { self.loadImage(this);	});
 			}
@@ -96,7 +96,7 @@
 			var winWidth = $(gBox).width() - $(gBox).find('.gallery-box-content').outerWidth(true) + $(gBox).find('.gallery-box-image').outerWidth(true);
 			if ($(gBox)[0].getBoundingClientRect().width !== $(gBox).width()) winWidth -= 1;	// fix hidpi float
 
-			if (this.scale) {
+			if (this.shrink) {
 				if (height > winHeight) {
 					width = width * winHeight / height;
 					height = winHeight;
@@ -107,7 +107,7 @@
 				}
 			}
 
-			return [width, height, this.scale && (orgHeight != height  || orgWidth != width)];
+			return [width, height, this.shrink && (orgHeight != height  || orgWidth != width)];
 		};
 
 		/**
@@ -188,6 +188,7 @@
 		this.showItem = function (item, oldHeight, num, itemLoad) {
 			var reScale = this.scaleImage(item, itemLoad);
 			$(this.box).find('.gallery-box').animate({ top: this.center( $(this.box).find('.gallery-box').outerHeight(true) - oldHeight + (reScale[1] ? parseFloat(reScale[1]) : 0) ) }, this.duration);
+			$(this.box).find('.gallery-box-content').animate({ width: reScale[0] + 'px' }, this.duration);
 			$(this.box).find('.gallery-box-image').append(item).animate({ width: reScale[0] + 'px', height: reScale[1] + 'px' }, this.duration, function () {
 				$(self.box).find('.gallery-box-image').children().fadeIn(200, function () {
 					if ($(item).attr('src') !== undefined) $(self.box).removeClass('gallery-box-loading');
@@ -226,13 +227,13 @@
 			$(this.box).find('a.gallery-box-right').click(function() {return self.showNext(false);});
 			$(document).keydown( function(e) {
 				if ($(self.box).is(':visible')) {
-					if (e.keyCode == 37) { e.preventDefault(); self.showNext(true); }
-					else if (e.keyCode == 39) { e.preventDefault(); self.showNext(false); }
+					if (self.arrows && e.keyCode == 37) { e.preventDefault(); self.showNext(true); }
+					else if (self.arrows && e.keyCode == 39) { e.preventDefault(); self.showNext(false); }
 					else if (e.keyCode == 27) { e.preventDefault(); $(self.box).fadeOut(500); }
 				}
 			});
 			$(this.box).find('a.gallery-box-close').click(function() { $(self.box).fadeOut(500); return false; });
-			$(this.box).find('.gallery-box-black').click(function() { $(self.box).fadeOut(500); });
+			$(this.box).find('.gallery-box-modal').click(function() { $(self.box).fadeOut(500); });
 		};
 
 		/**
@@ -240,14 +241,14 @@
 		 * @param {Boolean} background
 		 */
 		this.create = function (background) {
-			this.box = $('<div class="gallery-box-all"' + (this.mark ? ' id="' + this.mark + '"' : '') + '>' + (background ? '<div class="gallery-box-black"></div>' : '') + '</div>');
+			this.box = $('<div class="gallery-box-all"' + (this.mark ? ' id="' + this.mark + '"' : '') + '>' + (background ? '<div class="gallery-box-modal"></div>' : '') + '</div>');
 			$(this.box).append('<div class="gallery-box"><div class="gallery-box-content">' +
 				'<div class="gallery-box-image"><div class="gallery-box-loader"></div><img /></div>' +
 				'<div class="gallery-box-info">' + (this.arrows ? '<a class="gallery-box-left" title="'+this.locale["prev"]+'"><span>' + this.icons["prev"] + '</span></a>' +
 				(this.pager ? '<span class="gallery-box-num-current">1</span> / <span class="gallery-box-num-count">' + this.count + '</span>' : '') +
 				'<a class="gallery-box-right" title="'+this.locale["next"]+'"><span>' + this.icons["next"] + '</span></a>' : '') +
 				'<a class="gallery-box-close" title="'+this.locale["close"]+'"><span>' + this.icons["close"] + '</span></a></div>' +
-				(this.scale ? '<a class="gallery-box-zoom" title="'+this.locale["zoom"]+'" target="_blank"></a>' : '') +
+				(this.shrink ? '<a class="gallery-box-zoom" title="'+this.locale["zoom"]+'" target="_blank"></a>' : '') +
 				'<p class="gallery-box-title"></p></div></div>');
 			$("body").append(this.box);
 		};
@@ -258,7 +259,7 @@
 					$(this).click( function () { $(self.showNum(0)); return false; })
 				});
 			}
-			this.create(option['background'] !== undefined ? option['background'] : true);
+			this.create(option['modal'] !== undefined ? option['modal'] : true);
 			this.appendAction();
 		};
 
