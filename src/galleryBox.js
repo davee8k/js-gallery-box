@@ -2,7 +2,7 @@
  * jQuery Gallery Box version for jQuery 1.8+, support IE8+
  *
  * @author DaVee8k
- * @version 0.28.3
+ * @version 0.29.0
  * @license WTFNMFPL 1.0
  */
 (function ($) {
@@ -30,6 +30,7 @@
 		this.current = -1;
 		this.count = 0;
 		this.data = Array();
+		this.touches = Array();
 
 		// load links from element
 		this.load = function (element) {
@@ -106,7 +107,6 @@
 					width = winWidth;
 				}
 			}
-
 			return [width, height, this.shrink && (orgHeight != height  || orgWidth != width)];
 		};
 
@@ -261,6 +261,24 @@
 			}
 			this.create(option['modal'] !== undefined ? option['modal'] : true);
 			this.appendAction();
+
+			if (option['swipe'] !== false && this.arrows) {
+				$(this.box).on("touchstart", function (e) {
+					self.touches[0] = e.originalEvent.touches[0].clientX;
+				});
+				$(this.box).on("touchmove", function (e) {
+					self.touches[1] = e.originalEvent.touches[0].clientX;
+				});
+				$(this.box).on("touchend", function () {
+					if (self.touches.length === 2) {
+						var direction = self.touches[1] - self.touches[0];
+						if (Math.abs(direction) > ($(window).width() / 10)) {
+							self.showNext(direction > 0);
+						}
+					}
+					self.touches = Array();
+				});
+			}
 		};
 
 		// public functions

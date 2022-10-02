@@ -15,6 +15,13 @@ iframe      | string     | null       | class marking for non image content. Wil
 opener      | string     | null       | custom element for opening gallery
 arrows      | bool       | true       | display arrows and allows paging between items
 pager       | bool       | false      | show current page / total count of items
-shrink      | bool       | true       | scale down large images to fit the screen size
 modal       | bool       | true       | show gallery modal
+shrink      | bool       | true       | scale down large images to fit the screen size
+swipe       | bool       | true       | enable touch swipe
 duration    | int        | 250        | time (ms)
+
+## Usage
+
+```javascript
+$("#target").galleryBox({});
+```
