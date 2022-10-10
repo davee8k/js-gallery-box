@@ -2,7 +2,12 @@
 
 ## Description
 
-Simple javascript gallery
+A simple javascript gallery lightbox.
+Can display links to images or optionally html content (iframe).
+
+## Browser support
+
+Internet Explorer 8 and (almost) anything newer ;)
 
 ## Options
 
