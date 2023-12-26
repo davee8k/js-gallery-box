@@ -2,7 +2,7 @@
  * jQuery Gallery Box version for jQuery 1.8+, support IE8+
  *
  * @author DaVee8k
- * @version 0.29.0
+ * @version 0.29.1
  * @license WTFNMFPL 1.0
  */
 (function ($) {
@@ -19,11 +19,13 @@
 		this.plugin = option['plugin'] === undefined ? false : option['plugin'];
 		// variables
 		this.box = null;
+		this.modal = option['modal'] === undefined ? true : option['modal'];
 		this.mark = option['mark'] === undefined ? null : option['mark'];
 		this.item = option['item'] === undefined ? 'a' : option['item'];
 		this.arrows = option['arrows'] === undefined ? true : option['arrows'];
 		this.pager = option['pager'] === undefined ? false : option['pager'];
 		this.duration = option['duration'] === undefined ? 250 : option['duration'];
+		this.swipe = option['swipe'] !== false && this.arrows;
 		this.shrink = option['shrink'] === undefined ? true : option['shrink'];
 		this.iframe = option['iframe'] === undefined ? null : option['iframe'];
 
@@ -52,7 +54,10 @@
 
 				this.data.push({'src': $(link).attr('href'), 'title': title, 'link': link});
 				var x = this.count + 0;
-				$(link).click( function () { return self.showNum(x); });
+				$(link).click( function (e) {
+					e.preventDefault();
+					self.showNum(x);
+				});
 				this.count++;
 			}
 		};
@@ -68,7 +73,10 @@
 			img = img.substring(img.lastIndexOf('/') + 1);
 			for (var i = 0; i < this.data.length; i++) {
 				if (this.data[i]['src'].indexOf(img) > 0) {
-					$('#'+element).click( function () { return self.showNum(i); });
+					$('#'+element).click( function (e) {
+						e.preventDefault();
+						self.showNum(i);
+					});
 					$('#'+element).css('cursor','pointer');
 					break;
 				}
@@ -113,7 +121,6 @@
 		/**
 		 * Move to neighbor image
 		 * @param {Boolean} left
-		 * @returns {Boolean}
 		 */
 		this.showNext = function (left) {
 			if (left) {
@@ -122,15 +129,19 @@
 			else {
 				if (this.current < this.count-1) this.showNum(this.current + 1);
 			}
-			return false;
 		};
 
 		/**
 		 * Show content
 		 * @param {Integer} num
-		 * @returns {Boolean}
 		 */
 		this.showNum = function (num) {
+			// activate box on first request
+			if (this.box === null) {
+				this.create();
+				this.appendAction();
+			}
+
 			var imgNew = new Image();
 			var imgBox = $(this.box).find('.gallery-box-image');
 			var oldContent = $(imgBox).children('img');
@@ -144,7 +155,6 @@
 				$(this.box).find('.gallery-box').css('top', this.center());
 				if (this.current === num) {
 					this.showItem(oldContent, imgBox.height(), num, false);
-					return false;
 				}
 			}
 
@@ -176,7 +186,6 @@
 				$(this.box).find('a.gallery-box-left').toggle(this.current !== 0);
 				$(this.box).find('a.gallery-box-right').toggle(this.current < this.count-1);
 			}
-			return false;
 		};
 
 		/**
@@ -219,50 +228,36 @@
 		};
 
 		/**
-		 * Append action to arrows, keys and close button
+		 * Append action to arrows keys, swipe and close button
 		 */
 		this.appendAction = function () {
-			// action association
-			$(this.box).find('a.gallery-box-left').click(function() {return self.showNext(true);});
-			$(this.box).find('a.gallery-box-right').click(function() {return self.showNext(false);});
-			$(document).keydown( function(e) {
-				if ($(self.box).is(':visible')) {
-					if (self.arrows && e.keyCode == 37) { e.preventDefault(); self.showNext(true); }
-					else if (self.arrows && e.keyCode == 39) { e.preventDefault(); self.showNext(false); }
-					else if (e.keyCode == 27) { e.preventDefault(); $(self.box).fadeOut(500); }
-				}
-			});
-			$(this.box).find('a.gallery-box-close').click(function() { $(self.box).fadeOut(500); return false; });
-			$(this.box).find('.gallery-box-modal').click(function() { $(self.box).fadeOut(500); });
-		};
-
-		/**
-		 * Create elements for gallery window
-		 * @param {Boolean} background
-		 */
-		this.create = function (background) {
-			this.box = $('<div class="gallery-box-all"' + (this.mark ? ' id="' + this.mark + '"' : '') + '>' + (background ? '<div class="gallery-box-modal"></div>' : '') + '</div>');
-			$(this.box).append('<div class="gallery-box"><div class="gallery-box-content">' +
-				'<div class="gallery-box-image"><div class="gallery-box-loader"></div><img /></div>' +
-				'<div class="gallery-box-info">' + (this.arrows ? '<a class="gallery-box-left" title="'+this.locale["prev"]+'"><span>' + this.icons["prev"] + '</span></a>' +
-				(this.pager ? '<span class="gallery-box-num-current">1</span> / <span class="gallery-box-num-count">' + this.count + '</span>' : '') +
-				'<a class="gallery-box-right" title="'+this.locale["next"]+'"><span>' + this.icons["next"] + '</span></a>' : '') +
-				'<a class="gallery-box-close" title="'+this.locale["close"]+'"><span>' + this.icons["close"] + '</span></a></div>' +
-				(this.shrink ? '<a class="gallery-box-zoom" title="'+this.locale["zoom"]+'" target="_blank"></a>' : '') +
-				'<p class="gallery-box-title"></p></div></div>');
-			$("body").append(this.box);
-		};
-
-		if (this.load(this)) {
-			if (option['opener'] !== undefined) {
-				$(this).find(option['opener']).css('cursor','pointer').each( function () {
-					$(this).click( function () { $(self.showNum(0)); return false; })
+			if (this.arrows) {
+				$(this.box).find('a.gallery-box-left').click(function(e) {
+					e.preventDefault();
+					self.showNext(true);
+				});
+				$(this.box).find('a.gallery-box-right').click(function(e) {
+					e.preventDefault();
+					self.showNext(false);
+				});
+				$(document).keydown( function(e) {
+					if ($(self.box).is(':visible')) {
+						if (self.arrows && e.keyCode == 37) { e.preventDefault(); self.showNext(true); }
+						else if (self.arrows && e.keyCode == 39) { e.preventDefault(); self.showNext(false); }
+						else if (e.keyCode == 27) { e.preventDefault(); $(self.box).fadeOut(500); }
+					}
 				});
 			}
-			this.create(option['modal'] !== undefined ? option['modal'] : true);
-			this.appendAction();
+			$(this.box).find('a.gallery-box-close').click(function(e) {
+				e.preventDefault();
+				$(self.box).fadeOut(500);
+			});
+			$(this.box).find('.gallery-box-modal').click(function() {
+				$(self.box).fadeOut(500);
+			});
 
-			if (option['swipe'] !== false && this.arrows) {
+			if (this.swipe === true) {
+				var self = this;
 				$(this.box).on("touchstart", function (e) {
 					self.touches[0] = e.originalEvent.touches[0].clientX;
 				});
@@ -277,6 +272,33 @@
 						}
 					}
 					self.touches = Array();
+				});
+			}
+		};
+
+		/**
+		 * Create elements for gallery window
+		 */
+		this.create = function () {
+			this.box = $('<div class="gallery-box-all"' + (this.mark ? ' id="' + this.mark + '"' : '') + '>' + (this.modal ? '<div class="gallery-box-modal"></div>' : '') + '</div>');
+			$(this.box).append('<div class="gallery-box"><div class="gallery-box-content">' +
+				'<div class="gallery-box-image"><div class="gallery-box-loader"></div><img /></div>' +
+				'<div class="gallery-box-info">' + (this.arrows ? '<a class="gallery-box-left" title="'+this.locale["prev"]+'" href="#"><span>' + this.icons["prev"] + '</span></a>' +
+				(this.pager ? '<span class="gallery-box-num-current">1</span> / <span class="gallery-box-num-count">' + this.count + '</span>' : '') +
+				'<a class="gallery-box-right" title="'+this.locale["next"]+'" href="#"><span>' + this.icons["next"] + '</span></a>' : '') +
+				'<a class="gallery-box-close" title="'+this.locale["close"]+'" href="#"><span>' + this.icons["close"] + '</span></a></div>' +
+				(this.shrink ? '<a class="gallery-box-zoom" title="'+this.locale["zoom"]+'" target="_blank" href="#"></a>' : '') +
+				'<p class="gallery-box-title"></p></div></div>');
+			$("body").append(this.box);
+		};
+
+		if (this.load(this)) {
+			if (option['opener'] !== undefined) {
+				$(this).find(option['opener']).css('cursor','pointer').each( function () {
+					$(this).click( function (e) {
+						e.preventDefault();
+						$(self.showNum(0));
+					});
 				});
 			}
 		};
