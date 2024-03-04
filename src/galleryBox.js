@@ -2,8 +2,8 @@
  * jQuery Gallery Box version for jQuery 1.8+, support IE8+
  *
  * @author DaVee8k
- * @version 0.29.1
- * @license WTFNMFPL 1.0
+ * @version 0.30.0
+ * @license https://unlicense.org/
  */
 (function ($) {
 	$.fn.galleryBox = function (option) {
@@ -183,8 +183,8 @@
 			});
 
 			if (this.arrows) {
-				$(this.box).find('a.gallery-box-left').toggle(this.current !== 0);
-				$(this.box).find('a.gallery-box-right').toggle(this.current < this.count-1);
+				$(this.box).find('.gallery-box-left').toggle(this.current !== 0);
+				$(this.box).find('.gallery-box-right').toggle(this.current < this.count-1);
 			}
 		};
 
@@ -231,33 +231,36 @@
 		 * Append action to arrows keys, swipe and close button
 		 */
 		this.appendAction = function () {
-			if (this.arrows) {
-				$(this.box).find('a.gallery-box-left').click(function(e) {
-					e.preventDefault();
-					self.showNext(true);
-				});
-				$(this.box).find('a.gallery-box-right').click(function(e) {
-					e.preventDefault();
-					self.showNext(false);
-				});
-				$(document).keydown( function(e) {
-					if ($(self.box).is(':visible')) {
-						if (self.arrows && e.keyCode == 37) { e.preventDefault(); self.showNext(true); }
-						else if (self.arrows && e.keyCode == 39) { e.preventDefault(); self.showNext(false); }
-						else if (e.keyCode == 27) { e.preventDefault(); $(self.box).fadeOut(500); }
-					}
-				});
-			}
-			$(this.box).find('a.gallery-box-close').click(function(e) {
+			var self = this;
+
+			$(document).keydown( function (e) {
+				if ($(self.box).is(':visible')) {
+					if (self.arrows && e.keyCode == 37) { e.preventDefault(); self.showNext(true); }
+					else if (self.arrows && e.keyCode == 39) { e.preventDefault(); self.showNext(false); }
+					else if (e.keyCode == 27) { e.preventDefault(); $(self.box).fadeOut(500); }
+				}
+			});
+
+			$(this.box).find('.gallery-box-close').click(function (e) {
 				e.preventDefault();
 				$(self.box).fadeOut(500);
 			});
-			$(this.box).find('.gallery-box-modal').click(function() {
+			$(this.box).find('.gallery-box-modal').click(function () {
 				$(self.box).fadeOut(500);
 			});
 
+			if (this.arrows) {
+				$(this.box).find('.gallery-box-left').click(function (e) {
+					e.preventDefault();
+					self.showNext(true);
+				});
+				$(this.box).find('.gallery-box-right').click(function (e) {
+					e.preventDefault();
+					self.showNext(false);
+				});
+			}
+
 			if (this.swipe === true) {
-				var self = this;
 				$(this.box).on("touchstart", function (e) {
 					self.touches[0] = e.originalEvent.touches[0].clientX;
 				});
@@ -283,10 +286,10 @@
 			this.box = $('<div class="gallery-box-all"' + (this.mark ? ' id="' + this.mark + '"' : '') + '>' + (this.modal ? '<div class="gallery-box-modal"></div>' : '') + '</div>');
 			$(this.box).append('<div class="gallery-box"><div class="gallery-box-content">' +
 				'<div class="gallery-box-image"><div class="gallery-box-loader"></div><img /></div>' +
-				'<div class="gallery-box-info">' + (this.arrows ? '<a class="gallery-box-left" title="'+this.locale["prev"]+'" href="#"><span>' + this.icons["prev"] + '</span></a>' +
+				'<div class="gallery-box-info">' + (this.arrows ? '<button class="gallery-box-left" title="'+this.locale["prev"]+'"><span>' + this.icons["prev"] + '</span></button>' +
 				(this.pager ? '<span class="gallery-box-num-current">1</span> / <span class="gallery-box-num-count">' + this.count + '</span>' : '') +
-				'<a class="gallery-box-right" title="'+this.locale["next"]+'" href="#"><span>' + this.icons["next"] + '</span></a>' : '') +
-				'<a class="gallery-box-close" title="'+this.locale["close"]+'" href="#"><span>' + this.icons["close"] + '</span></a></div>' +
+				'<button class="gallery-box-right" title="'+this.locale["next"]+'"><span>' + this.icons["next"] + '</span></button>' : '') +
+				'<button class="gallery-box-close" title="'+this.locale["close"]+'"><span>' + this.icons["close"] + '</span></button></div>' +
 				(this.shrink ? '<a class="gallery-box-zoom" title="'+this.locale["zoom"]+'" target="_blank" href="#"></a>' : '') +
 				'<p class="gallery-box-title"></p></div></div>');
 			$("body").append(this.box);
